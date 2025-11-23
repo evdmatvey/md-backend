@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DocumentController } from './document.controller';
 import { DocumentService } from './document.service';
 import { DocumentEntity } from './entities/document.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([DocumentEntity])],
+  imports: [TypeOrmModule.forFeature([DocumentEntity]), ConfigModule],
   controllers: [DocumentController],
   providers: [DocumentService],
 })

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { nanoid } from 'nanoid';
 import { QueryFailedError, Repository } from 'typeorm';
@@ -13,9 +14,10 @@ export class DocumentService {
   public constructor(
     @InjectRepository(DocumentEntity)
     private readonly _documentRepository: Repository<DocumentEntity>,
+    private readonly _configService: ConfigService,
   ) {}
 
-  public async create(dto: CreateDocumentDto): Promise<DocumentEntity> {
+  public async create(dto: CreateDocumentDto): Promise<{ sharedLink: string }> {
     while (true) {
       const slug = nanoid(DocumentService.SLUG_LENGTH);
 
@@ -25,11 +27,15 @@ export class DocumentService {
       });
 
       try {
-        return this._documentRepository.save(document);
+        await this._documentRepository.save(document);
       } catch (error) {
         if (this._isNonUniqueSlugGenerated(error)) continue;
         throw error;
       }
+
+      const sharedLink = this._makeSharedLinkBySlug(slug);
+
+      return { sharedLink };
     }
   }
 
@@ -39,5 +45,11 @@ export class DocumentService {
       (error as QueryFailedError & { code: string }).code ===
         DocumentService.NON_UNIQUE_ERROR_CODE
     );
+  }
+
+  private _makeSharedLinkBySlug(slug: string): string {
+    const host = this._configService.get<string>('APP_HOST');
+
+    return `https://${host}/doc/${slug}`;
   }
 }
