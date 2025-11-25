@@ -20,6 +20,7 @@ describe('DocumentService', () => {
     repo = {
       create: jest.fn(),
       save: jest.fn(),
+      findOne: jest.fn(),
     };
 
     configService = {
@@ -119,5 +120,29 @@ describe('DocumentService', () => {
     expect(result).toEqual({
       sharedLink: 'https://localhost:4200/doc/okslug2',
     });
+  });
+
+  it('Get document by slug', async () => {
+    const slug = '4ud9qwkd';
+
+    (repo.findOne as jest.Mock).mockImplementation(({ where: { slug } }) => ({
+      slug,
+    }));
+
+    const result = await service.getBySlug(slug);
+
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { slug } });
+    expect(result.slug).toBe(slug);
+  });
+
+  it('Get NotFoundException while getting document by incorrect slug', async () => {
+    const slug = '4ud9qwkd';
+
+    (repo.findOne as jest.Mock).mockResolvedValue(null);
+
+    await expect(service.getBySlug(slug)).rejects.toThrow(
+      `Документ по slug "${slug}" не найден.`,
+    );
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { slug } });
   });
 });
