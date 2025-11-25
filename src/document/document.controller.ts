@@ -1,13 +1,16 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -15,8 +18,10 @@ import {
 import { DocumentService } from './document.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import {
+  CreateDocumentOkResponse,
   DocumentBadRequestResponse,
-  DocumentOkResponse,
+  DocumentNotFoundResponse,
+  GetDocumentOkResponse,
 } from './swagger/response.types';
 
 @ApiTags('Документы')
@@ -29,7 +34,7 @@ export class DocumentController {
   @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'Создание короткой ссылки на markdown' })
   @ApiOkResponse({
-    type: DocumentOkResponse,
+    type: CreateDocumentOkResponse,
     description: 'Короткая ссылка на переданный markdown успешно создана',
   })
   @ApiBadRequestResponse({
@@ -39,5 +44,21 @@ export class DocumentController {
   })
   public async create(@Body() dto: CreateDocumentDto) {
     return this._documentService.create(dto);
+  }
+
+  @Get(':slug')
+  @ApiOperation({ summary: 'Получение markdown документа по его slug' })
+  @ApiOkResponse({
+    type: GetDocumentOkResponse,
+    description: 'Документ успешно получен по переданному slug',
+  })
+  @ApiNotFoundResponse({
+    type: DocumentNotFoundResponse,
+    description: 'По переданному slug документ не найден',
+  })
+  public async getBySlug(@Param('slug') slug: string) {
+    const document = await this._documentService.getBySlug(slug);
+
+    return { document };
   }
 }
