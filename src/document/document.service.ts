@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { nanoid } from 'nanoid';
@@ -16,6 +16,19 @@ export class DocumentService {
     private readonly _documentRepository: Repository<DocumentEntity>,
     private readonly _configService: ConfigService,
   ) {}
+
+  public async getBySlug(slug: string): Promise<DocumentEntity> {
+    const document = await this._documentRepository.findOne({
+      where: {
+        slug,
+      },
+    });
+
+    if (!document)
+      throw new NotFoundException(`Документ по slug \"${slug}\" не найден.`);
+
+    return document;
+  }
 
   public async create(dto: CreateDocumentDto): Promise<{ sharedLink: string }> {
     while (true) {
