@@ -50,7 +50,7 @@ describe('DocumentService', () => {
     jest.clearAllMocks();
   });
 
-  it('успешное создание документа — возвращается корректная sharedLink', async () => {
+  it('Create document and return valid sharedLink', async () => {
     const dto: CreateDocumentDto = {
       title: 'title',
       markdown: 'document',
@@ -79,7 +79,7 @@ describe('DocumentService', () => {
     });
   });
 
-  it('если первый сгенерированный slug конфликтует (код 23505), сервис повторяет и возвращает ссылку с новым slug', async () => {
+  it('Retry slug generation on conflict and return new slug', async () => {
     const dto: CreateDocumentDto = {
       title: 'title',
       markdown: 'document',
