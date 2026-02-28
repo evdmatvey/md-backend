@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { nanoid } from 'nanoid';
 import { QueryFailedError, Repository } from 'typeorm';
+import { RedisService } from '@/redis/redis.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { DocumentEntity } from './entities/document.entity';
 
@@ -15,9 +16,17 @@ export class DocumentService {
     @InjectRepository(DocumentEntity)
     private readonly _documentRepository: Repository<DocumentEntity>,
     private readonly _configService: ConfigService,
+    private readonly _redisService: RedisService,
   ) {}
 
   public async getBySlug(slug: string): Promise<DocumentEntity> {
+    const cachedKey = `document:${slug}`;
+    const cached = await this._redisService.get<DocumentEntity>(cachedKey);
+
+    if (cached) {
+      return cached;
+    }
+
     const document = await this._documentRepository.findOne({
       where: {
         slug,
@@ -26,6 +35,8 @@ export class DocumentService {
 
     if (!document)
       throw new NotFoundException(`Документ по slug \"${slug}\" не найден.`);
+
+    await this._redisService.set(cachedKey, document);
 
     return document;
   }
@@ -61,8 +72,9 @@ export class DocumentService {
   }
 
   private _makeSharedLinkBySlug(slug: string): string {
-    const host = this._configService.get<string>('APP_HOST');
+    const frontendUrl = this._configService.getOrThrow<string>('FRONTEND_URL');
+    const baseUrl = frontendUrl.replace(/\/$/, '');
 
-    return `https://${host}/doc/${slug}`;
+    return `${baseUrl}/doc/${slug}`;
   }
 }
