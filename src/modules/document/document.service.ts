@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { nanoid } from 'nanoid';
 import { QueryFailedError, Repository } from 'typeorm';
-import { RedisService } from '@/redis/redis.service';
+import { RedisService } from '@/modules/redis/redis.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { DocumentEntity } from './entities/document.entity';
 

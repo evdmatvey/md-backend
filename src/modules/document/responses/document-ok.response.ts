@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Document } from '@/domains/entities/document.entity';
 
 export class DocumentEntityResponse {
   @ApiProperty({
@@ -35,6 +36,18 @@ export class DocumentEntityResponse {
     description: 'Дата создания в ISO формате',
   })
   createdAt: string;
+
+  public static fromDomain(document: Document): DocumentEntityResponse {
+    const { id, title, markdown, slug, createdAt } = document;
+
+    return {
+      id,
+      title,
+      markdown,
+      slug,
+      createdAt: createdAt.toISOString(),
+    };
+  }
 }
 
 export class CreateDocumentOkResponse {
@@ -45,6 +58,15 @@ export class CreateDocumentOkResponse {
       'Короткая ссылка, которая ведёт на загруженный пользователем markdown',
   })
   sharedLink: string;
+
+  public static fromDomain(
+    document: Document,
+    sharedUrl: string,
+  ): CreateDocumentOkResponse {
+    return {
+      sharedLink: `${sharedUrl}/doc/${document.slug}`,
+    };
+  }
 }
 
 export class GetDocumentOkResponse {
@@ -53,52 +75,11 @@ export class GetDocumentOkResponse {
     type: DocumentEntityResponse,
     description: 'Markdown документ',
   })
-  document: string;
-}
+  document: DocumentEntityResponse;
 
-export class DocumentBadRequestResponse {
-  @ApiProperty({
-    required: true,
-    example: ['Название не должно быть пустым.'],
-    description:
-      'Сообщения, уточняющие какие именно данные были переданы неверно',
-  })
-  message: string[];
-
-  @ApiProperty({
-    required: true,
-    example: 'Bad Request',
-    description: 'Тип HTTP ошибки в строковом виде',
-  })
-  error: string;
-
-  @ApiProperty({
-    required: true,
-    example: 400,
-    description: 'Тип HTTP ошибки в виде кода',
-  })
-  statusCode: number;
-}
-
-export class DocumentNotFoundResponse {
-  @ApiProperty({
-    required: true,
-    example: 'Документ по slug \"843jdea3\" не найден.',
-    description: 'Сообщения, уточняющие почему не был найден документ',
-  })
-  message: string[];
-
-  @ApiProperty({
-    required: true,
-    example: 'Not Found',
-    description: 'Тип HTTP ошибки в строковом виде',
-  })
-  error: string;
-
-  @ApiProperty({
-    required: true,
-    example: 404,
-    description: 'Тип HTTP ошибки в виде кода',
-  })
-  statusCode: number;
+  public static fromDomain(document: Document): GetDocumentOkResponse {
+    return {
+      document: DocumentEntityResponse.fromDomain(document),
+    };
+  }
 }

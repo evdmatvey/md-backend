@@ -2,8 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { DocumentActionEntity } from './document-action.entity';
 
 @Entity({ name: 'documents' })
 export class DocumentEntity {
@@ -18,6 +20,12 @@ export class DocumentEntity {
 
   @Column({ unique: true })
   slug: string;
+
+  @OneToMany(() => DocumentActionEntity, (action) => action.document, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  actions: DocumentActionEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
