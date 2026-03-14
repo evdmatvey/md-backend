@@ -3,9 +3,9 @@ import {
   DocumentBannedError,
   DocumentNotFoundError,
   DocumentUnexpectedActionError,
-} from '@/domains/errors/document.error';
-import { DomainError } from '@/domains/errors/domain.error';
-import { DomainErrorFilter } from '@/modules/filters/domain-error.filter';
+  DomainError,
+} from '@/domains/errors';
+import { DomainErrorFilter } from '@/modules/shared/filters';
 
 @Catch(
   DocumentNotFoundError,

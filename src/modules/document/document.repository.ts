@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryFailedError, QueryRunner, Repository } from 'typeorm';
-import { Document } from '@/domains/entities/document.entity';
-import { ModerationActionType } from '@/domains/enums/moderation-action-type.enum';
+import { Document } from '@/domains/entities';
 import {
   DocumentNotFoundError,
   DocumentNotUniqueSlugError,
-} from '@/domains/errors/document.error';
-import { DocumentRepositoryPort } from '@/domains/ports/out/document-repository.port';
+} from '@/domains/errors';
+import { DocumentRepositoryPort } from '@/domains/ports/out';
 import { DocumentMapper } from './document.mapper';
 import { DocumentActionEntity } from './entities/document-action.entity';
 import { DocumentEntity } from './entities/document.entity';
@@ -127,7 +126,7 @@ export class DocumentRepository implements DocumentRepositoryPort {
     const action = documentActionRepository.create({
       documentId: document.id,
       adminId: newAction.moderatorId,
-      type: newAction.type === ModerationActionType.BAN ? 'ban' : 'unban',
+      type: newAction.type,
       reason: newAction.reason,
     });
 

@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DocumentModule } from './document/document.module';
-import { RedisModule } from './redis/redis.module';
+import { AuthModule } from './auth';
+import { DocumentModule } from './document';
+import { RedisModule } from './shared/redis';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { RedisModule } from './redis/redis.module';
     }),
     DocumentModule,
     RedisModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import type { DocumentActionType } from '../types/document-action-type.type';
+import { ModerationActionType } from '@/domains/enums';
 import { DocumentEntity } from './document.entity';
 
 @Entity({ name: 'document_actions' })
@@ -20,8 +20,11 @@ export class DocumentActionEntity {
   @Column({ name: 'document_id' })
   documentId: string;
 
-  @Column()
-  type: DocumentActionType;
+  @Column({
+    type: 'enum',
+    enum: ModerationActionType,
+  })
+  type: ModerationActionType;
 
   @Column()
   reason: string;
