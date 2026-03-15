@@ -1,4 +1,5 @@
 import { ModerationActionType } from '../enums/moderation-action-type.enum';
+import { BanAction } from './ban-action.entity';
 import { ModerationAction } from './moderation-action.entity';
 
 export class ModerationActionHistory {
@@ -18,6 +19,15 @@ export class ModerationActionHistory {
     if (!lastAction) return null;
 
     return lastAction;
+  }
+
+  public get currentBan(): BanAction | null {
+    if (!this.isBanned) return null;
+
+    if (this.lastAction?.type === ModerationActionType.BAN)
+      return this.lastAction as BanAction;
+
+    return null;
   }
 
   public get isBanned(): boolean {
