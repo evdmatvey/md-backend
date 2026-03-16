@@ -15,3 +15,9 @@ export class UserUnexpectedBanActionError extends DomainError {
     super(message);
   }
 }
+
+export class UserAlreadyExistError extends DomainError {
+  public constructor(username: string) {
+    super(`Пользователь с именем ${username} уже существует.`);
+  }
+}

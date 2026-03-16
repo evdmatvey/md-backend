@@ -1,4 +1,4 @@
-import { SESSION_CONSTANTS } from '../constants';
+import { NEW_ID, SESSION_CONSTANTS } from '../constants';
 import { DeviceInfo } from '../types';
 import { EntityWithId } from './entity-with-id.entity';
 
@@ -14,6 +14,19 @@ export class Session extends EntityWithId {
     public readonly createdAt: Date,
   ) {
     super(id);
+  }
+
+  public static create(userId: string, deviceInfo: DeviceInfo): Session {
+    return new Session(
+      NEW_ID,
+      userId,
+      '',
+      deviceInfo,
+      false,
+      new Date(),
+      new Date(),
+      new Date(),
+    );
   }
 
   public extend(refreshTokenHash: string) {

@@ -7,3 +7,5 @@ export type { SessionCachePort } from './session-cache.port';
 export type { SessionRepositoryPort } from './session-repository.port';
 export type { UserCachePort } from './user-cache.port';
 export type { UserRepositoryPort } from './user-repository.port';
+export type { UserAgentParserPort } from './user-agent-parser.port';
+export type { TokenHasherPort } from './token-hasher.port';

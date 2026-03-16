@@ -2,6 +2,7 @@ export class RegisterUserCommand {
   public constructor(
     private readonly _username: string,
     private readonly _password: string,
+    private readonly _userAgent: string,
   ) {}
 
   public get username(): string {
@@ -10,5 +11,9 @@ export class RegisterUserCommand {
 
   public get password(): string {
     return this._password;
+  }
+
+  public get userAgent(): string {
+    return this._userAgent;
   }
 }
