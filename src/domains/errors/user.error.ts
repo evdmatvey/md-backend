@@ -21,3 +21,33 @@ export class UserAlreadyExistError extends DomainError {
     super(`Пользователь с именем ${username} уже существует.`);
   }
 }
+
+export class UserNotFoundError extends DomainError {
+  public readonly identifierType: 'id' | 'username';
+  public readonly identifierValue: string;
+
+  public constructor(identifier: { id: string } | { username: string }) {
+    const [type, value] =
+      'id' in identifier
+        ? ['id', identifier.id]
+        : ['имени', identifier.username];
+
+    super(`Пользователь по ${type} "${value}" не найден.`);
+  }
+}
+
+export class UserPasswordMismatchError extends DomainError {
+  public constructor() {
+    super('Неверный логин или пароль.');
+  }
+}
+
+export class UserBannedError extends DomainError {
+  public constructor(
+    public readonly username: string,
+    public readonly reason: string,
+    public readonly occurredAt: Date,
+  ) {
+    super(`Пользователь "${username}" заблокирован.`);
+  }
+}

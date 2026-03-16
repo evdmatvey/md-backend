@@ -1,6 +1,10 @@
 import { Session, User } from '@/domains/entities';
-import { UserAlreadyExistError } from '@/domains/errors';
-import { RegisterUserCommand } from '@/domains/ports/in';
+import {
+  UserBannedError,
+  UserNotFoundError,
+  UserPasswordMismatchError,
+} from '@/domains/errors';
+import { LoginUserCommand } from '@/domains/ports/in';
 import {
   PasswordHasherPort,
   SessionRepositoryPort,
@@ -10,16 +14,16 @@ import {
   UserRepositoryPort,
 } from '@/domains/ports/out';
 import { DeviceInfo, Tokens } from '@/domains/types';
-import { RegisterUserService } from '../register-user.service';
+import { LoginUserService } from '../login-user.service';
 
-describe('RegisterUserService', () => {
+describe('LoginUserService', () => {
   let tokenServicePort: jest.Mocked<TokenServicePort>;
   let userRepositoryPort: jest.Mocked<UserRepositoryPort>;
   let sessionRepositoryPort: jest.Mocked<SessionRepositoryPort>;
   let passwordHasherPort: jest.Mocked<PasswordHasherPort>;
   let tokenHasherPort: jest.Mocked<TokenHasherPort>;
   let userAgentParserPort: jest.Mocked<UserAgentParserPort>;
-  let registerUserService: RegisterUserService;
+  let loginUserService: LoginUserService;
 
   beforeEach(() => {
     tokenServicePort = {
@@ -49,7 +53,7 @@ describe('RegisterUserService', () => {
       parse: jest.fn(),
     } as jest.Mocked<UserAgentParserPort>;
 
-    registerUserService = new RegisterUserService(
+    loginUserService = new LoginUserService(
       tokenServicePort,
       userRepositoryPort,
       sessionRepositoryPort,
@@ -59,19 +63,13 @@ describe('RegisterUserService', () => {
     );
   });
 
-  it('Should successfully register user', async () => {
-    setupSuccessfulRegistration();
+  it('Should successfully login user', async () => {
+    setupSuccessfulLogin();
 
-    const command = new RegisterUserCommand(
-      'username',
-      'password',
-      'Mozilla...',
-    );
+    const command = new LoginUserCommand('username', 'password', 'Mozilla...');
+    const authResult = await loginUserService.execute(command);
 
-    const authResult = await registerUserService.execute(command);
-
-    expect(authResult.user.username).toBe(command.username);
-    expect(authResult.user.passwordHash).toBe('hashedPassword');
+    expect(authResult.user.username).toBe('username');
 
     expect(sessionRepositoryPort.save).toHaveBeenNthCalledWith(
       1,
@@ -83,21 +81,34 @@ describe('RegisterUserService', () => {
     );
   });
 
-  it('Should throw user already exist error', async () => {
-    setupUserAlreadyExist();
+  it('Should throw user not found error', async () => {
+    setupUserNotFoundLogin();
 
-    const command = new RegisterUserCommand(
-      'username',
-      'password',
-      'Mozilla...',
-    );
-
-    expect(registerUserService.execute(command)).rejects.toThrow(
-      new UserAlreadyExistError(command.username),
+    const command = new LoginUserCommand('username', 'password', 'Mozilla...');
+    expect(loginUserService.execute(command)).rejects.toThrow(
+      new UserNotFoundError({ username: 'username' }),
     );
   });
 
-  function setupSuccessfulRegistration() {
+  it('Should throw password mismatch error', async () => {
+    setupPasswordMismatchLogin();
+
+    const command = new LoginUserCommand('username', 'password', 'Mozilla...');
+    expect(loginUserService.execute(command)).rejects.toThrow(
+      new UserPasswordMismatchError(),
+    );
+  });
+
+  it('Should throw user banned error', async () => {
+    setupUserBannedLogin();
+
+    const command = new LoginUserCommand('username', 'password', 'Mozilla...');
+    expect(loginUserService.execute(command)).rejects.toThrow(
+      new UserBannedError('username', 'reason', new Date()),
+    );
+  });
+
+  function setupSuccessfulLogin() {
     const parsedUserAgent: DeviceInfo = {
       browser: 'Chrome',
       os: 'Windows',
@@ -106,14 +117,13 @@ describe('RegisterUserService', () => {
       access: 'accessToken',
       refresh: 'refreshToken',
     };
-    const createdUser = User.create('username', 'hashedPassword');
-    const createdSession = Session.create(createdUser.id, parsedUserAgent);
-    const extendedSession = Session.create(createdUser.id, parsedUserAgent);
+    const user = User.create('username', 'hashedPassword');
+    const createdSession = Session.create(user.id, parsedUserAgent);
+    const extendedSession = Session.create(user.id, parsedUserAgent);
     extendedSession.extend(tokensPair.refresh);
 
-    userRepositoryPort.findByUsername.mockResolvedValue(null);
-    passwordHasherPort.hash.mockResolvedValue('hashedPassword');
-    userRepositoryPort.save.mockResolvedValue(createdUser);
+    userRepositoryPort.findByUsername.mockResolvedValue(user);
+    passwordHasherPort.verify.mockResolvedValue(true);
     tokenServicePort.generatePair.mockResolvedValue(tokensPair);
     tokenHasherPort.hash.mockResolvedValue('hashedToken');
     userAgentParserPort.parse.mockReturnValue(parsedUserAgent);
@@ -122,9 +132,22 @@ describe('RegisterUserService', () => {
       .mockResolvedValueOnce(extendedSession);
   }
 
-  function setupUserAlreadyExist() {
-    const existedUser = User.create('username', 'hashedPassword');
+  function setupUserNotFoundLogin() {
+    userRepositoryPort.findByUsername.mockResolvedValue(null);
+  }
 
-    userRepositoryPort.findByUsername.mockResolvedValue(existedUser);
+  function setupPasswordMismatchLogin() {
+    const user = User.create('username', 'hashedPassword');
+
+    userRepositoryPort.findByUsername.mockResolvedValue(user);
+    passwordHasherPort.verify.mockResolvedValue(false);
+  }
+
+  function setupUserBannedLogin() {
+    const user = User.create('username', 'hashedPassword');
+    user.ban('adminId', 'reason');
+
+    userRepositoryPort.findByUsername.mockResolvedValue(user);
+    passwordHasherPort.verify.mockResolvedValue(true);
   }
 });
