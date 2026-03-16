@@ -8,3 +8,8 @@ export {
   GetDocumentBySlugUseCaseSymbol,
   type GetDocumentBySlugUseCase,
 } from './get-document-by-slug.use-case';
+export { RegisterUserCommand } from './register-user.command';
+export {
+  RegisterUserUseCaseSymbol,
+  type RegisterUserUseCase,
+} from './register-user.use-case';
