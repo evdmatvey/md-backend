@@ -13,3 +13,8 @@ export {
   RegisterUserUseCaseSymbol,
   type RegisterUserUseCase,
 } from './register-user.use-case';
+export { LoginUserCommand } from './login-user.command';
+export {
+  LoginUserUseCaseSymbol,
+  type LoginUserUseCase,
+} from './login-user.use-case';
