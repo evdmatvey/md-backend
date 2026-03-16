@@ -1,4 +1,4 @@
-import { Document } from '@/domains/entities/document.entity';
+import { Document } from '@/domains/entities';
 
 export interface DocumentCachePort {
   get(slug: string): Promise<Document | null>;
