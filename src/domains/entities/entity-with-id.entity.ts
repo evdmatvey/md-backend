@@ -1,4 +1,4 @@
-import { NEW_ID } from '../constants/ids.constants';
+import { NEW_ID } from '../constants';
 
 export abstract class EntityWithId {
   constructor(public readonly id: string) {}

@@ -1,5 +1,5 @@
-import { NEW_ID } from '../constants/ids.constants';
-import { UserRole } from '../enums/user-role.enum';
+import { NEW_ID } from '../constants';
+import { UserRole } from '../enums';
 import { EntityWithId } from './entity-with-id.entity';
 
 export class RoleAssignmentMetadata extends EntityWithId {

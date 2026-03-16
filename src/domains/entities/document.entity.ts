@@ -1,4 +1,4 @@
-import { NEW_ID } from '../constants/ids.constants';
+import { NEW_ID } from '../constants';
 import { DocumentUnexpectedActionError } from '../errors/document.error';
 import { BanableEntity } from './banable.entity';
 import { ModerationActionHistory } from './moderation-action-history.entity';
