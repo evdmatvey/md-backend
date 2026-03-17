@@ -18,3 +18,4 @@ export {
   LoginUserUseCaseSymbol,
   type LoginUserUseCase,
 } from './login-user.use-case';
+export { LogoutUserCommand } from './logout-user.command';
