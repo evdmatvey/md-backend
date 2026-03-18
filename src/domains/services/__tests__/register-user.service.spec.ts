@@ -33,8 +33,8 @@ describe('RegisterUserService', () => {
     } as jest.Mocked<UserRepositoryPort>;
     sessionRepositoryPort = {
       delete: jest.fn(),
-      getAllByUserId: jest.fn(),
-      getById: jest.fn(),
+      findAllByUserId: jest.fn(),
+      findById: jest.fn(),
       save: jest.fn(),
     } as jest.Mocked<SessionRepositoryPort>;
     passwordHasherPort = {

@@ -37,9 +37,9 @@ describe('LoginUserService', () => {
     } as jest.Mocked<UserRepositoryPort>;
     sessionRepositoryPort = {
       delete: jest.fn(),
-      getAllByUserId: jest.fn(),
-      getById: jest.fn(),
       save: jest.fn(),
+      findAllByUserId: jest.fn(),
+      findById: jest.fn(),
     } as jest.Mocked<SessionRepositoryPort>;
     passwordHasherPort = {
       hash: jest.fn(),
