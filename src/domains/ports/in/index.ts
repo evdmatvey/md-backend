@@ -23,3 +23,8 @@ export {
   LogoutUserUseCaseSymbol,
   type LogoutUserUseCase,
 } from './logout-user.use-case';
+export { ExtendSessionCommand } from './extend-session.command';
+export {
+  ExtendSessionUseCaseSymbol,
+  type ExtendSessionUseCase,
+} from './extend-session.use-case';
