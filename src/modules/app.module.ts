@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth';
 import { DocumentModule } from './document';
 import { RedisModule } from './shared/redis';
+import { UserModule } from './user';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RedisModule } from './shared/redis';
     DocumentModule,
     RedisModule,
     AuthModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],
