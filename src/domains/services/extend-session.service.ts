@@ -4,6 +4,7 @@ import {
   SessionMismatchError,
   SessionNotFoundError,
   SessionTokensMismatchError,
+  UserBannedError,
   UserNotFoundError,
 } from '../errors';
 import { ExtendSessionCommand, ExtendSessionUseCase } from '../ports/in';
@@ -46,6 +47,13 @@ export class ExtendSessionService implements ExtendSessionUseCase {
 
     const user = await this._getUserById(userId);
     if (!user) throw new UserNotFoundError({ id: userId });
+
+    if (user.isBanned)
+      throw new UserBannedError(
+        user.username,
+        user.currentBan!.reason,
+        user.currentBan!.occurredAt,
+      );
 
     const tokens = await this._tokenService.generatePair({
       userId,

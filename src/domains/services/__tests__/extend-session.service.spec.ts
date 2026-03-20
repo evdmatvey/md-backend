@@ -4,6 +4,7 @@ import {
   SessionMismatchError,
   SessionNotFoundError,
   SessionTokensMismatchError,
+  UserBannedError,
   UserNotFoundError,
 } from '@/domains/errors';
 import { ExtendSessionCommand } from '@/domains/ports/in';
@@ -115,6 +116,15 @@ describe('ExtendSessionService', () => {
     );
   });
 
+  it('Should throw user banned error', async () => {
+    setupUserBannedExtend();
+
+    const command = new ExtendSessionCommand('refreshToken');
+    expect(extendSessionService.execute(command)).rejects.toThrow(
+      UserBannedError,
+    );
+  });
+
   it('Should throw session mismatch error', async () => {
     setupSessionMismatchExtend();
 
@@ -203,6 +213,26 @@ describe('ExtendSessionService', () => {
     tokenHasherPort.verify.mockResolvedValue(true);
     userCachePort.get.mockResolvedValue(null);
     userRepositoryPort.findById.mockResolvedValue(null);
+  }
+
+  function setupUserBannedExtend() {
+    tokenServicePort.verify.mockResolvedValue({
+      userId: 'userId',
+      sessionId: 'sessionId',
+    });
+    const session = Session.create('userId', {
+      browser: 'Chrome',
+      os: 'Windows',
+    });
+    session.extend('');
+    const user = User.create('username', 'passwordHash');
+    user.ban('adminId', 'reason');
+
+    sessionCachePort.get.mockResolvedValue(null);
+    sessionRepositoryPort.findById.mockResolvedValue(session);
+    tokenHasherPort.verify.mockResolvedValue(true);
+    userCachePort.get.mockResolvedValue(null);
+    userRepositoryPort.findById.mockResolvedValue(user);
   }
 
   function setupSessionMismatchExtend() {
