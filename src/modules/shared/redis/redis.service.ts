@@ -46,6 +46,15 @@ export class RedisService {
     await this._client.setEx(key, ttlSeconds, serialized);
   }
 
+  public async delete(key: string): Promise<boolean> {
+    try {
+      const result = await this._client.del(key);
+      return result > 0;
+    } catch {
+      return false;
+    }
+  }
+
   private _serialize<T>(data: T): string {
     if (typeof data === 'string') return data;
 
