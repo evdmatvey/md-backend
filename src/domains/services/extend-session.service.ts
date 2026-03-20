@@ -1,3 +1,4 @@
+import { Session, User } from '../entities';
 import {
   SessionExpiredError,
   SessionMismatchError,
@@ -7,9 +8,11 @@ import {
 } from '../errors';
 import { ExtendSessionCommand, ExtendSessionUseCase } from '../ports/in';
 import {
+  SessionCachePort,
   SessionRepositoryPort,
   TokenHasherPort,
   TokenServicePort,
+  UserCachePort,
   UserRepositoryPort,
 } from '../ports/out';
 import { AuthResult } from '../types';
@@ -20,6 +23,8 @@ export class ExtendSessionService implements ExtendSessionUseCase {
     private readonly _userRepository: UserRepositoryPort,
     private readonly _sessionRepository: SessionRepositoryPort,
     private readonly _tokenHasher: TokenHasherPort,
+    private readonly _sessionCache: SessionCachePort,
+    private readonly _userCache: UserCachePort,
   ) {}
 
   public async execute(command: ExtendSessionCommand): Promise<AuthResult> {
@@ -27,7 +32,7 @@ export class ExtendSessionService implements ExtendSessionUseCase {
 
     const { sessionId, userId } = await this._tokenService.verify(refreshToken);
 
-    const session = await this._sessionRepository.findById(sessionId);
+    const session = await this._getSessionById(sessionId);
     if (!session) throw new SessionNotFoundError(sessionId);
 
     if (session.userId !== userId) throw new SessionMismatchError();
@@ -39,7 +44,7 @@ export class ExtendSessionService implements ExtendSessionUseCase {
     );
     if (!isTokensMatch) throw new SessionTokensMismatchError();
 
-    const user = await this._userRepository.findById(userId);
+    const user = await this._getUserById(userId);
     if (!user) throw new UserNotFoundError({ id: userId });
 
     const tokens = await this._tokenService.generatePair({
@@ -49,10 +54,31 @@ export class ExtendSessionService implements ExtendSessionUseCase {
     const hashedRefreshToken = await this._tokenHasher.hash(tokens.refresh);
 
     session.extend(hashedRefreshToken);
+    await this._sessionCache.set(sessionId, session);
 
     return {
       tokens,
       user,
     };
+  }
+
+  private async _getSessionById(sessionId: string): Promise<Session | null> {
+    const cachedSession = await this._sessionCache.get(sessionId);
+    if (cachedSession) return cachedSession;
+
+    const session = await this._sessionRepository.findById(sessionId);
+    if (session) await this._sessionCache.set(sessionId, session);
+
+    return session;
+  }
+
+  private async _getUserById(userId: string): Promise<User | null> {
+    const cachedUser = await this._userCache.get(userId);
+    if (cachedUser) return cachedUser;
+
+    const user = await this._userRepository.findById(userId);
+    if (user) await this._userCache.set(userId, user);
+
+    return user;
   }
 }

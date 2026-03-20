@@ -3,10 +3,12 @@ import { UserAlreadyExistError } from '../errors';
 import { RegisterUserCommand, RegisterUserUseCase } from '../ports/in';
 import {
   PasswordHasherPort,
+  SessionCachePort,
   SessionRepositoryPort,
   TokenHasherPort,
   TokenServicePort,
   UserAgentParserPort,
+  UserCachePort,
   UserRepositoryPort,
 } from '../ports/out';
 import { AuthResult } from '../types';
@@ -19,6 +21,8 @@ export class RegisterUserService implements RegisterUserUseCase {
     private readonly _passwordHasher: PasswordHasherPort,
     private readonly _tokenHasher: TokenHasherPort,
     private readonly _userAgentParser: UserAgentParserPort,
+    private readonly _userCache: UserCachePort,
+    private readonly _sessionCache: SessionCachePort,
   ) {}
 
   public async execute(command: RegisterUserCommand): Promise<AuthResult> {
@@ -47,6 +51,9 @@ export class RegisterUserService implements RegisterUserUseCase {
     session.extend(hashedRefreshToken);
 
     await this._sessionRepository.save(session);
+
+    await this._userCache.set(user.id, user);
+    await this._sessionCache.set(session.id, session);
 
     return {
       tokens,

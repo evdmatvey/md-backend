@@ -1,12 +1,17 @@
 import { Session } from '@/domains/entities';
 import { SessionNotFoundError } from '@/domains/errors';
 import { LogoutUserCommand } from '@/domains/ports/in';
-import { SessionRepositoryPort, TokenServicePort } from '@/domains/ports/out';
+import {
+  SessionCachePort,
+  SessionRepositoryPort,
+  TokenServicePort,
+} from '@/domains/ports/out';
 import { LogoutUserService } from '../logout-user.service';
 
 describe('LogoutUserService', () => {
   let sessionRepositoryPort: jest.Mocked<SessionRepositoryPort>;
   let tokenServicePort: jest.Mocked<TokenServicePort>;
+  let sessionCachePort: jest.Mocked<SessionCachePort>;
   let logoutUserService: LogoutUserService;
 
   beforeEach(() => {
@@ -16,15 +21,20 @@ describe('LogoutUserService', () => {
       findById: jest.fn(),
       findAllByUserId: jest.fn(),
     } as jest.Mocked<SessionRepositoryPort>;
-
     tokenServicePort = {
       generatePair: jest.fn(),
       verify: jest.fn(),
     } as jest.Mocked<TokenServicePort>;
+    sessionCachePort = {
+      get: jest.fn(),
+      set: jest.fn(),
+      delete: jest.fn(),
+    };
 
     logoutUserService = new LogoutUserService(
       tokenServicePort,
       sessionRepositoryPort,
+      sessionCachePort,
     );
   });
 
@@ -54,6 +64,7 @@ describe('LogoutUserService', () => {
       userId: 'userId',
       sessionId: 'sessionId',
     });
+    sessionCachePort.get.mockResolvedValue(null);
     sessionRepositoryPort.findById.mockResolvedValue(
       Session.create('userId', { browser: 'Chrome', os: 'Windows' }),
     );
@@ -64,6 +75,7 @@ describe('LogoutUserService', () => {
       userId: 'userId',
       sessionId: 'sessionId',
     });
+    sessionCachePort.get.mockResolvedValue(null);
     sessionRepositoryPort.findById.mockResolvedValue(null);
   }
 });

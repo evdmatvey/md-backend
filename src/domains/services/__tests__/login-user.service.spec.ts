@@ -7,10 +7,12 @@ import {
 import { LoginUserCommand } from '@/domains/ports/in';
 import {
   PasswordHasherPort,
+  SessionCachePort,
   SessionRepositoryPort,
   TokenHasherPort,
   TokenServicePort,
   UserAgentParserPort,
+  UserCachePort,
   UserRepositoryPort,
 } from '@/domains/ports/out';
 import { DeviceInfo, Tokens } from '@/domains/types';
@@ -23,6 +25,8 @@ describe('LoginUserService', () => {
   let passwordHasherPort: jest.Mocked<PasswordHasherPort>;
   let tokenHasherPort: jest.Mocked<TokenHasherPort>;
   let userAgentParserPort: jest.Mocked<UserAgentParserPort>;
+  let userCachePort: jest.Mocked<UserCachePort>;
+  let sessionCachePort: jest.Mocked<SessionCachePort>;
   let loginUserService: LoginUserService;
 
   beforeEach(() => {
@@ -52,6 +56,16 @@ describe('LoginUserService', () => {
     userAgentParserPort = {
       parse: jest.fn(),
     } as jest.Mocked<UserAgentParserPort>;
+    sessionCachePort = {
+      get: jest.fn(),
+      set: jest.fn(),
+      delete: jest.fn(),
+    } as jest.Mocked<SessionCachePort>;
+    userCachePort = {
+      get: jest.fn(),
+      set: jest.fn(),
+      delete: jest.fn(),
+    } as jest.Mocked<UserCachePort>;
 
     loginUserService = new LoginUserService(
       tokenServicePort,
@@ -60,6 +74,8 @@ describe('LoginUserService', () => {
       passwordHasherPort,
       tokenHasherPort,
       userAgentParserPort,
+      userCachePort,
+      sessionCachePort,
     );
   });
 

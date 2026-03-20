@@ -8,9 +8,11 @@ import {
 } from '@/domains/errors';
 import { ExtendSessionCommand } from '@/domains/ports/in';
 import {
+  SessionCachePort,
   SessionRepositoryPort,
   TokenHasherPort,
   TokenServicePort,
+  UserCachePort,
   UserRepositoryPort,
 } from '@/domains/ports/out';
 import { ExtendSessionService } from '../extend-session.service';
@@ -20,6 +22,8 @@ describe('ExtendSessionService', () => {
   let userRepositoryPort: jest.Mocked<UserRepositoryPort>;
   let sessionRepositoryPort: jest.Mocked<SessionRepositoryPort>;
   let tokenHasherPort: jest.Mocked<TokenHasherPort>;
+  let sessionCachePort: jest.Mocked<SessionCachePort>;
+  let userCachePort: jest.Mocked<UserCachePort>;
   let extendSessionService: ExtendSessionService;
 
   beforeEach(() => {
@@ -38,17 +42,28 @@ describe('ExtendSessionService', () => {
       findById: jest.fn(),
       save: jest.fn(),
     } as jest.Mocked<SessionRepositoryPort>;
-
     tokenHasherPort = {
       hash: jest.fn(),
       verify: jest.fn(),
     } as jest.Mocked<TokenHasherPort>;
+    sessionCachePort = {
+      get: jest.fn(),
+      set: jest.fn(),
+      delete: jest.fn(),
+    } as jest.Mocked<SessionCachePort>;
+    userCachePort = {
+      get: jest.fn(),
+      set: jest.fn(),
+      delete: jest.fn(),
+    } as jest.Mocked<UserCachePort>;
 
     extendSessionService = new ExtendSessionService(
       tokenServicePort,
       userRepositoryPort,
       sessionRepositoryPort,
       tokenHasherPort,
+      sessionCachePort,
+      userCachePort,
     );
   });
 
@@ -119,8 +134,10 @@ describe('ExtendSessionService', () => {
       os: 'Windows',
     });
     session.extend('');
+    sessionCachePort.get.mockResolvedValue(null);
     sessionRepositoryPort.findById.mockResolvedValue(session);
     tokenHasherPort.verify.mockResolvedValue(true);
+    userCachePort.get.mockResolvedValue(null);
     userRepositoryPort.findById.mockResolvedValue(
       User.create('username', 'passwordHash'),
     );
@@ -136,6 +153,7 @@ describe('ExtendSessionService', () => {
       userId: 'userId',
       sessionId: 'sessionId',
     });
+    sessionCachePort.get.mockResolvedValue(null);
     sessionRepositoryPort.findById.mockResolvedValue(null);
   }
 
@@ -150,6 +168,7 @@ describe('ExtendSessionService', () => {
       os: 'Windows',
     });
     session.expiresAt = new Date('2025-10-10');
+    sessionCachePort.get.mockResolvedValue(null);
     sessionRepositoryPort.findById.mockResolvedValue(session);
   }
 
@@ -163,6 +182,7 @@ describe('ExtendSessionService', () => {
       os: 'Windows',
     });
     session.extend('');
+    sessionCachePort.get.mockResolvedValue(null);
     sessionRepositoryPort.findById.mockResolvedValue(session);
     tokenHasherPort.verify.mockResolvedValue(false);
   }
@@ -178,8 +198,10 @@ describe('ExtendSessionService', () => {
     });
     session.extend('');
 
+    sessionCachePort.get.mockResolvedValue(null);
     sessionRepositoryPort.findById.mockResolvedValue(session);
     tokenHasherPort.verify.mockResolvedValue(true);
+    userCachePort.get.mockResolvedValue(null);
     userRepositoryPort.findById.mockResolvedValue(null);
   }
 
@@ -194,6 +216,7 @@ describe('ExtendSessionService', () => {
     });
     session.extend('');
 
+    sessionCachePort.get.mockResolvedValue(null);
     sessionRepositoryPort.findById.mockResolvedValue(session);
   }
 });
