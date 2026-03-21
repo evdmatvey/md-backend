@@ -6,6 +6,7 @@ import { SessionEntity } from './entities/session.entity';
 import { SessionCache } from './libs/session-cache.lib';
 import { TokenHasher } from './libs/token-hasher.lib';
 import { TokenService } from './libs/token-service.lib';
+import { SessionRepository } from './session.repository';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { TokenService } from './libs/token-service.lib';
     ConfigModule,
   ],
   controllers: [],
-  providers: [TokenService, SessionCache, TokenHasher],
+  providers: [TokenService, SessionCache, TokenHasher, SessionRepository],
 })
 export class AuthModule {}
