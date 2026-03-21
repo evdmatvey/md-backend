@@ -5,4 +5,4 @@ export const SESSION_CONSTANTS = {
   accessTokenExpiresInMs: 15 * 60 * 1000,
   extendThreshold: '1d',
   extendThresholdMs: 24 * 60 * 60 * 1000,
-};
+} as const;

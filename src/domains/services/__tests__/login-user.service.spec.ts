@@ -32,7 +32,7 @@ describe('LoginUserService', () => {
   beforeEach(() => {
     tokenServicePort = {
       generatePair: jest.fn(),
-      verify: jest.fn(),
+      verifyRefreshToken: jest.fn(),
     } as jest.Mocked<TokenServicePort>;
     userRepositoryPort = {
       findById: jest.fn(),

@@ -30,7 +30,7 @@ describe('ExtendSessionService', () => {
   beforeEach(() => {
     tokenServicePort = {
       generatePair: jest.fn(),
-      verify: jest.fn(),
+      verifyRefreshToken: jest.fn(),
     } as jest.Mocked<TokenServicePort>;
     userRepositoryPort = {
       findById: jest.fn(),
@@ -135,7 +135,7 @@ describe('ExtendSessionService', () => {
   });
 
   function setupSuccessfulExtend() {
-    tokenServicePort.verify.mockResolvedValue({
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
       userId: 'userId',
       sessionId: 'sessionId',
     });
@@ -159,7 +159,7 @@ describe('ExtendSessionService', () => {
   }
 
   function setupSessionNotFoundExtend() {
-    tokenServicePort.verify.mockResolvedValue({
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
       userId: 'userId',
       sessionId: 'sessionId',
     });
@@ -168,7 +168,7 @@ describe('ExtendSessionService', () => {
   }
 
   function setupSessionExpiredExtend() {
-    tokenServicePort.verify.mockResolvedValue({
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
       userId: 'userId',
       sessionId: 'sessionId',
     });
@@ -183,7 +183,7 @@ describe('ExtendSessionService', () => {
   }
 
   function setupSessionTokensMismatchExtend() {
-    tokenServicePort.verify.mockResolvedValue({
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
       userId: 'userId',
       sessionId: 'sessionId',
     });
@@ -198,7 +198,7 @@ describe('ExtendSessionService', () => {
   }
 
   function setupUserNotFoundExtend() {
-    tokenServicePort.verify.mockResolvedValue({
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
       userId: 'userId',
       sessionId: 'sessionId',
     });
@@ -216,7 +216,7 @@ describe('ExtendSessionService', () => {
   }
 
   function setupUserBannedExtend() {
-    tokenServicePort.verify.mockResolvedValue({
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
       userId: 'userId',
       sessionId: 'sessionId',
     });
@@ -236,7 +236,7 @@ describe('ExtendSessionService', () => {
   }
 
   function setupSessionMismatchExtend() {
-    tokenServicePort.verify.mockResolvedValue({
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
       userId: 'userId',
       sessionId: 'sessionId',
     });

@@ -16,7 +16,8 @@ export class LogoutUserService implements LogoutUserUseCase {
 
   public async execute(command: LogoutUserCommand): Promise<void> {
     const { refreshToken } = command;
-    const { sessionId } = await this._tokenService.verify(refreshToken);
+    const { sessionId } =
+      await this._tokenService.verifyRefreshToken(refreshToken);
 
     const session = await this._getSessionById(sessionId);
     if (!session) throw new SessionNotFoundError(sessionId);

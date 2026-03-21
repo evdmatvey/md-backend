@@ -23,3 +23,9 @@ export class SessionTokensMismatchError extends DomainError {
     super('Токен не совпал с токеном сессии.');
   }
 }
+
+export class SessionTokenError extends DomainError {
+  public constructor() {
+    super('Передан невалидный токен.');
+  }
+}

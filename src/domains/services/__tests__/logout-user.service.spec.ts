@@ -23,7 +23,7 @@ describe('LogoutUserService', () => {
     } as jest.Mocked<SessionRepositoryPort>;
     tokenServicePort = {
       generatePair: jest.fn(),
-      verify: jest.fn(),
+      verifyRefreshToken: jest.fn(),
     } as jest.Mocked<TokenServicePort>;
     sessionCachePort = {
       get: jest.fn(),
@@ -60,7 +60,7 @@ describe('LogoutUserService', () => {
   });
 
   function setupSuccessfulLogout() {
-    tokenServicePort.verify.mockResolvedValue({
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
       userId: 'userId',
       sessionId: 'sessionId',
     });
@@ -71,7 +71,7 @@ describe('LogoutUserService', () => {
   }
 
   function setupNotFoundLogin() {
-    tokenServicePort.verify.mockResolvedValue({
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
       userId: 'userId',
       sessionId: 'sessionId',
     });

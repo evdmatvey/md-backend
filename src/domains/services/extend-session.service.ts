@@ -31,7 +31,8 @@ export class ExtendSessionService implements ExtendSessionUseCase {
   public async execute(command: ExtendSessionCommand): Promise<AuthResult> {
     const { refreshToken } = command;
 
-    const { sessionId, userId } = await this._tokenService.verify(refreshToken);
+    const { sessionId, userId } =
+      await this._tokenService.verifyRefreshToken(refreshToken);
 
     const session = await this._getSessionById(sessionId);
     if (!session) throw new SessionNotFoundError(sessionId);
