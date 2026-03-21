@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SessionEntity } from './entities/session.entity';
+import { SessionCache } from './libs/session-cache.lib';
 import { TokenService } from './libs/token-service.lib';
 
 @Module({
@@ -23,6 +24,6 @@ import { TokenService } from './libs/token-service.lib';
     ConfigModule,
   ],
   controllers: [],
-  providers: [TokenService],
+  providers: [TokenService, SessionCache],
 })
 export class AuthModule {}
