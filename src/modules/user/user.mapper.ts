@@ -10,7 +10,7 @@ import { ModerationActionType } from '@/domains/enums';
 import { UserEntity } from './entities/user.entity';
 
 export class UserMapper {
-  public static toDomain(entity: UserEntity): User {
+  public static mapToDomain(entity: UserEntity): User {
     const {
       id,
       username,

@@ -45,4 +45,10 @@ export abstract class BanableEntity extends EntityWithId {
   public get currentBan(): BanAction | null {
     return this._banHistory.currentBan;
   }
+
+  public get isBanHistoryUpdated(): boolean {
+    return this._banHistory.history.some((moderationAction) =>
+      moderationAction.isNew(),
+    );
+  }
 }

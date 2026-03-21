@@ -90,6 +90,12 @@ export class User extends BanableEntity {
     return this._assignmentHistory.history;
   }
 
+  public get isAssignmentHistoryUpdated(): boolean {
+    return this._assignmentHistory.history.some((assignment) =>
+      assignment.isNew(),
+    );
+  }
+
   protected throwUnexpectedBanActionError(isBanned: boolean): void {
     throw new UserUnexpectedBanActionError(isBanned);
   }

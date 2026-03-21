@@ -88,7 +88,7 @@ export class DocumentRepository implements DocumentRepositoryPort {
       existingEntity.title = document.title;
       existingEntity.markdown = document.markdown;
 
-      if (this._hasNewDocumentAction(document)) {
+      if (document.isBanHistoryUpdated) {
         await this._saveNewDocumentAction(document, queryRunner);
       }
 
@@ -102,14 +102,6 @@ export class DocumentRepository implements DocumentRepositoryPort {
     } finally {
       await queryRunner.release();
     }
-  }
-
-  private _hasNewDocumentAction(document: Document): boolean {
-    const banHistory = document.banHistory;
-
-    if (banHistory.length === 0) return false;
-
-    return banHistory[banHistory.length - 1].isNew();
   }
 
   private async _saveNewDocumentAction(

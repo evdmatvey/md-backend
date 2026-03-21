@@ -7,6 +7,7 @@ import { UserEntity } from './entities/user.entity';
 import { PasswordHasher } from './libs/password-hasher.lib';
 import { UserAgentParser } from './libs/user-agent-parser.lib';
 import { UserCache } from './libs/user-cache.lib';
+import { UserRepository } from './user.repository';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { UserCache } from './libs/user-cache.lib';
     RedisModule,
   ],
   controllers: [],
-  providers: [PasswordHasher, UserCache, UserAgentParser],
-  exports: [PasswordHasher, UserCache, UserAgentParser],
+  providers: [PasswordHasher, UserCache, UserAgentParser, UserRepository],
+  exports: [PasswordHasher, UserCache, UserAgentParser, UserRepository],
 })
 export class UserModule {}
