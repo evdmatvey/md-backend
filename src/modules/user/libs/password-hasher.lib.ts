@@ -10,10 +10,16 @@ export class PasswordHasher implements PasswordHasherPort {
   public constructor(private readonly _configService: ConfigService) {
     this._options = {
       type: argon2.argon2id,
-      memoryCost: +this._configService.getOrThrow<number>('ARGON_MEMORY_COST'),
-      timeCost: +this._configService.getOrThrow<number>('ARGON_TIME_COST'),
-      parallelism: +this._configService.getOrThrow<number>('ARGON_PARALLELISM'),
-      hashLength: +this._configService.getOrThrow<number>('ARGON_HASH_LENGTH'),
+      memoryCost: +this._configService.getOrThrow<number>(
+        'PASSWORD_MEMORY_COST',
+      ),
+      timeCost: +this._configService.getOrThrow<number>('PASSWORD_TIME_COST'),
+      parallelism: +this._configService.getOrThrow<number>(
+        'PASSWORD_PARALLELISM',
+      ),
+      hashLength: +this._configService.getOrThrow<number>(
+        'PASSWORD_HASH_LENGTH',
+      ),
     };
   }
 
