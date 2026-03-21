@@ -1,6 +1,8 @@
 export { Document } from './document.entity';
 export { ModerationAction } from './moderation-action.entity';
 export { ModerationActionHistory } from './moderation-action-history.entity';
+export { BanAction } from './ban-action.entity';
+export { UnbanAction } from './unban-action.entity';
 export { User } from './user.entity';
 export { RoleAssignmentHistory } from './role-assignment-history.entity';
 export { RoleAssignmentMetadata } from './role-assignment-metadata.entity';
