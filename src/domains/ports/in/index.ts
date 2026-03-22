@@ -28,3 +28,4 @@ export {
   ExtendSessionUseCaseSymbol,
   type ExtendSessionUseCase,
 } from './extend-session.use-case';
+export { GetUsersQuery } from './get-users.query';
