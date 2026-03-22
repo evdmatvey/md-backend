@@ -1,10 +1,11 @@
 import { UserRole } from '@/domains/enums';
+import { UserStatusFilter } from '@/domains/types';
 
 export class GetUsersQuery {
   public constructor(
     private readonly _username?: string,
     private readonly _role?: UserRole,
-    private readonly _isBanned?: boolean,
+    private readonly _status?: UserStatusFilter,
     private readonly _createdAtStart?: Date,
     private readonly _createdAtEnd?: Date,
   ) {}
@@ -17,8 +18,8 @@ export class GetUsersQuery {
     return this._role;
   }
 
-  public get isBanned(): boolean | undefined {
-    return this._isBanned;
+  public get status(): UserStatusFilter | undefined {
+    return this._status;
   }
 
   public get createdAtStart(): Date | undefined {
