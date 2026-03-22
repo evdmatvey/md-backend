@@ -30,7 +30,7 @@ export class UserEntity {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @OneToMany(() => RoleAssignmentEntity, (assignment) => assignment.userId, {
+  @OneToMany(() => RoleAssignmentEntity, (assignment) => assignment.user, {
     onDelete: 'CASCADE',
     eager: true,
   })

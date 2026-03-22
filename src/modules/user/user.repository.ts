@@ -17,7 +17,9 @@ export class UserRepository implements UserRepositoryPort {
   ) {}
 
   public async findById(userId: string): Promise<User | null> {
-    const user = await this._userRepository.findOne({ where: { id: userId } });
+    const user = await this._userRepository.findOne({
+      where: { id: userId },
+    });
 
     if (!user) return null;
 
@@ -25,7 +27,9 @@ export class UserRepository implements UserRepositoryPort {
   }
 
   public async findByUsername(username: string): Promise<User | null> {
-    const user = await this._userRepository.findOne({ where: { username } });
+    const user = await this._userRepository.findOne({
+      where: { username },
+    });
 
     if (!user) return null;
 

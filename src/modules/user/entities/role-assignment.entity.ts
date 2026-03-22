@@ -13,10 +13,10 @@ export class RoleAssignmentEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('user_id')
+  @Column({ name: 'user_id' })
   userId: string;
 
-  @Column('admin_id')
+  @Column({ name: 'admin_id' })
   adminId: string;
 
   @Column()

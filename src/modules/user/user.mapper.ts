@@ -21,7 +21,7 @@ export class UserMapper {
       createdAt,
     } = entity;
 
-    const mappedRoleAssignments = roleAssignments.map(
+    const mappedRoleAssignments = (roleAssignments ?? []).map(
       (assignment) =>
         new RoleAssignmentMetadata(
           assignment.id,
@@ -32,7 +32,7 @@ export class UserMapper {
         ),
     );
 
-    const mappedBans = bans.map((ban) => {
+    const mappedBans = (bans ?? []).map((ban) => {
       if (ban.type === ModerationActionType.BAN) {
         return new BanAction(ban.id, ban.adminId, ban.reason, ban.createdAt);
       } else {
