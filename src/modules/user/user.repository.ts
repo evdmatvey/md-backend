@@ -16,6 +16,12 @@ export class UserRepository implements UserRepositoryPort {
     private readonly _userRepository: Repository<UserEntity>,
   ) {}
 
+  public async findAll(): Promise<User[]> {
+    const users = await this._userRepository.find();
+
+    return users.map((user) => UserMapper.mapToDomain(user));
+  }
+
   public async findById(userId: string): Promise<User | null> {
     const user = await this._userRepository.findOne({
       where: { id: userId },
