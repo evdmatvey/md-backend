@@ -18,6 +18,7 @@ import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiHeader,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -34,6 +35,9 @@ import {
   LoginUserCommand,
   type LoginUserUseCase,
   LoginUserUseCaseSymbol,
+  LogoutUserCommand,
+  type LogoutUserUseCase,
+  LogoutUserUseCaseSymbol,
   RegisterUserCommand,
   type RegisterUserUseCase,
   RegisterUserUseCaseSymbol,
@@ -67,6 +71,8 @@ export class AuthController {
     private readonly _loginUserUseCase: LoginUserUseCase,
     @Inject(ExtendSessionUseCaseSymbol)
     private readonly _extendSessionUseCase: ExtendSessionUseCase,
+    @Inject(LogoutUserUseCaseSymbol)
+    private readonly _logoutUserUseCase: LogoutUserUseCase,
     private readonly _configService: ConfigService,
   ) {}
 
@@ -183,6 +189,26 @@ export class AuthController {
     this._addRefreshTokenToResponse(res, authResult.tokens.refresh);
 
     return AuthResultResponse.fromDomain(authResult);
+  }
+
+  @Post('logout')
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Выход из аккаунта' })
+  @ApiNoContentResponse({ description: 'Вы успешно вышли из аккаунта' })
+  @ApiNotFoundResponse({
+    type: SessionNotFoundResponse,
+    description: 'Сессия не найдена по sessionId из токена',
+  })
+  public async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    const refreshToken = this._getRefreshTokenFromRequest(req, res);
+    const command = new LogoutUserCommand(refreshToken);
+
+    await this._logoutUserUseCase.execute(command);
+
+    this._removeRefreshTokenFromResponse(res);
   }
 
   private _addRefreshTokenToResponse(

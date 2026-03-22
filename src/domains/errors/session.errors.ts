@@ -26,6 +26,6 @@ export class SessionTokensMismatchError extends DomainError {
 
 export class SessionTokenError extends DomainError {
   public constructor() {
-    super('Передан невалидный токен.');
+    super('Нет доступа. Войдите или зарегистрируйтесь.');
   }
 }

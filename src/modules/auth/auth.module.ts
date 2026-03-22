@@ -5,10 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   ExtendSessionUseCaseSymbol,
   LoginUserUseCaseSymbol,
+  LogoutUserUseCaseSymbol,
   RegisterUserUseCaseSymbol,
 } from '@/domains/ports/in';
-import { LoginUserService, RegisterUserService } from '@/domains/services';
-import { ExtendSessionService } from '@/domains/services/extend-session.service';
+import {
+  ExtendSessionService,
+  LoginUserService,
+  LogoutUserService,
+  RegisterUserService,
+} from '@/domains/services';
 import { RedisModule } from '../shared/redis';
 import {
   PasswordHasher,
@@ -156,6 +161,21 @@ import { SessionRepository } from './session.repository';
         UserCache,
         SessionCache,
       ],
+    },
+    {
+      provide: LogoutUserUseCaseSymbol,
+      useClass: LogoutUserService,
+    },
+    {
+      provide: LogoutUserUseCaseSymbol,
+      useFactory: (_tokenService, _sessionRepository, _sessionCache) => {
+        return new LogoutUserService(
+          _tokenService,
+          _sessionRepository,
+          _sessionCache,
+        );
+      },
+      inject: [TokenService, SessionRepository, SessionCache],
     },
   ],
 })
