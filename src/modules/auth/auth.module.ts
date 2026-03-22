@@ -2,6 +2,17 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RegisterUserUseCaseSymbol } from '@/domains/ports/in';
+import { RegisterUserService } from '@/domains/services';
+import { RedisModule } from '../shared/redis';
+import {
+  PasswordHasher,
+  UserAgentParser,
+  UserCache,
+  UserModule,
+  UserRepository,
+} from '../user';
+import { AuthController } from './auth.controller';
 import { SessionEntity } from './entities/session.entity';
 import { SessionCache } from './libs/session-cache.lib';
 import { TokenHasher } from './libs/token-hasher.lib';
@@ -12,7 +23,7 @@ import { SessionRepository } from './session.repository';
   imports: [
     TypeOrmModule.forFeature([SessionEntity]),
     JwtModule.registerAsync({
-      imports: [ConfigService],
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         signOptions: {
@@ -24,8 +35,53 @@ import { SessionRepository } from './session.repository';
       }),
     }),
     ConfigModule,
+    UserModule,
+    RedisModule,
   ],
-  controllers: [],
-  providers: [TokenService, SessionCache, TokenHasher, SessionRepository],
+  controllers: [AuthController],
+  providers: [
+    TokenService,
+    SessionCache,
+    TokenHasher,
+    SessionRepository,
+    {
+      provide: RegisterUserUseCaseSymbol,
+      useClass: RegisterUserService,
+    },
+    {
+      provide: RegisterUserUseCaseSymbol,
+      useFactory: (
+        _tokenService: TokenService,
+        _userRepository: UserRepository,
+        _sessionRepository: SessionRepository,
+        _passwordHasher: PasswordHasher,
+        _tokenHasher: TokenHasher,
+        _userAgentParser: UserAgentParser,
+        _userCache: UserCache,
+        _sessionCache: SessionCache,
+      ) => {
+        return new RegisterUserService(
+          _tokenService,
+          _userRepository,
+          _sessionRepository,
+          _passwordHasher,
+          _tokenHasher,
+          _userAgentParser,
+          _userCache,
+          _sessionCache,
+        );
+      },
+      inject: [
+        TokenService,
+        UserRepository,
+        SessionRepository,
+        PasswordHasher,
+        TokenHasher,
+        UserAgentParser,
+        UserCache,
+        SessionCache,
+      ],
+    },
+  ],
 })
 export class AuthModule {}
