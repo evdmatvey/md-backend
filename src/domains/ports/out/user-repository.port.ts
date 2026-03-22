@@ -4,4 +4,5 @@ export interface UserRepositoryPort {
   save(user: User): Promise<User>;
   findById(userId: string): Promise<User | null>;
   findByUsername(username: string): Promise<User | null>;
+  findAll(): Promise<User[]>;
 }
