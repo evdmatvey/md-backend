@@ -3,10 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
+  ExtendSessionUseCaseSymbol,
   LoginUserUseCaseSymbol,
   RegisterUserUseCaseSymbol,
 } from '@/domains/ports/in';
 import { LoginUserService, RegisterUserService } from '@/domains/services';
+import { ExtendSessionService } from '@/domains/services/extend-session.service';
 import { RedisModule } from '../shared/redis';
 import {
   PasswordHasher,
@@ -119,6 +121,38 @@ import { SessionRepository } from './session.repository';
         PasswordHasher,
         TokenHasher,
         UserAgentParser,
+        UserCache,
+        SessionCache,
+      ],
+    },
+    {
+      provide: ExtendSessionUseCaseSymbol,
+      useClass: ExtendSessionService,
+    },
+    {
+      provide: ExtendSessionUseCaseSymbol,
+      useFactory: (
+        _tokenService,
+        _userRepository,
+        _sessionRepository,
+        _tokenHasher,
+        _userCache,
+        _sessionCache,
+      ) => {
+        return new ExtendSessionService(
+          _tokenService,
+          _userRepository,
+          _sessionRepository,
+          _tokenHasher,
+          _sessionCache,
+          _userCache,
+        );
+      },
+      inject: [
+        TokenService,
+        UserRepository,
+        SessionRepository,
+        TokenHasher,
         UserCache,
         SessionCache,
       ],

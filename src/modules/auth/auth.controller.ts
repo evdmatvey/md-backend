@@ -5,6 +5,7 @@ import {
   HttpCode,
   Inject,
   Post,
+  Req,
   Res,
   UseFilters,
   UsePipes,
@@ -23,9 +24,13 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { type Response } from 'express';
+import { type Request, type Response } from 'express';
 import { SESSION_CONSTANTS } from '@/domains/constants';
+import { SessionTokenError } from '@/domains/errors';
 import {
+  ExtendSessionCommand,
+  type ExtendSessionUseCase,
+  ExtendSessionUseCaseSymbol,
   LoginUserCommand,
   type LoginUserUseCase,
   LoginUserUseCaseSymbol,
@@ -39,6 +44,9 @@ import { AuthErrorFilter } from './filters/auth-error.filter';
 import {
   AuthBadRequestResponse,
   AuthResultResponse,
+  SessionExpiredResponse,
+  SessionMismatchResponse,
+  SessionNotFoundResponse,
   UserAlreadyExistResponse,
   UserBannedResponse,
   UserNotFoundResponse,
@@ -57,6 +65,8 @@ export class AuthController {
     private readonly _registerUserUseCase: RegisterUserUseCase,
     @Inject(LoginUserUseCaseSymbol)
     private readonly _loginUserUseCase: LoginUserUseCase,
+    @Inject(ExtendSessionUseCaseSymbol)
+    private readonly _extendSessionUseCase: ExtendSessionUseCase,
     private readonly _configService: ConfigService,
   ) {}
 
@@ -142,6 +152,39 @@ export class AuthController {
     return AuthResultResponse.fromDomain(authResult);
   }
 
+  @Post('refresh')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Продление сессии по refresh токену' })
+  @ApiOkResponse({
+    type: AuthResultResponse,
+    description: 'Сессия успешно продлена',
+  })
+  @ApiUnauthorizedResponse({
+    type: SessionExpiredResponse,
+    description: 'Сессия истекла',
+  })
+  @ApiForbiddenResponse({
+    type: SessionMismatchResponse,
+    description: 'userId из сессии и из токена не совпадают',
+  })
+  @ApiNotFoundResponse({
+    type: SessionNotFoundResponse,
+    description: 'Сессия не найдена по sessionId из токена',
+  })
+  public async extendSession(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResultResponse> {
+    const refreshToken = this._getRefreshTokenFromRequest(req, res);
+    const command = new ExtendSessionCommand(refreshToken);
+
+    const authResult = await this._extendSessionUseCase.execute(command);
+
+    this._addRefreshTokenToResponse(res, authResult.tokens.refresh);
+
+    return AuthResultResponse.fromDomain(authResult);
+  }
+
   private _addRefreshTokenToResponse(
     res: Response,
     refreshToken: string,
@@ -167,5 +210,16 @@ export class AuthController {
       sameSite: isDev ? 'lax' : 'strict',
       secure: !isDev,
     });
+  }
+
+  private _getRefreshTokenFromRequest(req: Request, res: Response): string {
+    const refreshTokenFromCookies = req.cookies[this.REFRESH_TOKEN_NAME];
+
+    if (!refreshTokenFromCookies) {
+      this._removeRefreshTokenFromResponse(res);
+      throw new SessionTokenError();
+    }
+
+    return refreshTokenFromCookies;
   }
 }
