@@ -1,7 +1,6 @@
 import { User } from '../entities';
 import { UserRole } from '../enums';
-import { GetUsersQuery } from '../ports/in';
-import { GetUsersUseCase } from '../ports/in/get-users.use-case';
+import { GetUsersQuery, GetUsersUseCase } from '../ports/in';
 import { UserRepositoryPort } from '../ports/out';
 import { UserStatusFilter } from '../types';
 

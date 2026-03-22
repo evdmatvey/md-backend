@@ -29,3 +29,7 @@ export {
   type ExtendSessionUseCase,
 } from './extend-session.use-case';
 export { GetUsersQuery } from './get-users.query';
+export {
+  GetUsersUseCaseSymbol,
+  type GetUsersUseCase,
+} from './get-users.use-case';

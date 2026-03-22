@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GetUsersUseCaseSymbol } from '@/domains/ports/in';
+import { UserRepositoryPort } from '@/domains/ports/out';
+import { GetUsersService } from '@/domains/services';
 import { RedisModule } from '../shared/redis';
 import { RoleAssignmentEntity } from './entities/role-assignment.entity';
 import { UserBanEntity } from './entities/user-ban.entity';
@@ -15,7 +18,23 @@ import { UserRepository } from './user.repository';
     RedisModule,
   ],
   controllers: [],
-  providers: [PasswordHasher, UserCache, UserAgentParser, UserRepository],
+  providers: [
+    PasswordHasher,
+    UserCache,
+    UserAgentParser,
+    UserRepository,
+    {
+      provide: GetUsersUseCaseSymbol,
+      useClass: GetUsersService,
+    },
+    {
+      provide: GetUsersUseCaseSymbol,
+      useFactory: (_usersRepository: UserRepositoryPort) => {
+        return new GetUsersService(_usersRepository);
+      },
+      inject: [UserRepository],
+    },
+  ],
   exports: [PasswordHasher, UserCache, UserAgentParser, UserRepository],
 })
 export class UserModule {}
