@@ -2,8 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RegisterUserUseCaseSymbol } from '@/domains/ports/in';
-import { RegisterUserService } from '@/domains/services';
+import {
+  LoginUserUseCaseSymbol,
+  RegisterUserUseCaseSymbol,
+} from '@/domains/ports/in';
+import { LoginUserService, RegisterUserService } from '@/domains/services';
 import { RedisModule } from '../shared/redis';
 import {
   PasswordHasher,
@@ -61,6 +64,44 @@ import { SessionRepository } from './session.repository';
         _sessionCache: SessionCache,
       ) => {
         return new RegisterUserService(
+          _tokenService,
+          _userRepository,
+          _sessionRepository,
+          _passwordHasher,
+          _tokenHasher,
+          _userAgentParser,
+          _userCache,
+          _sessionCache,
+        );
+      },
+      inject: [
+        TokenService,
+        UserRepository,
+        SessionRepository,
+        PasswordHasher,
+        TokenHasher,
+        UserAgentParser,
+        UserCache,
+        SessionCache,
+      ],
+    },
+    {
+      provide: LoginUserUseCaseSymbol,
+      useClass: LoginUserService,
+    },
+    {
+      provide: LoginUserUseCaseSymbol,
+      useFactory: (
+        _tokenService: TokenService,
+        _userRepository: UserRepository,
+        _sessionRepository: SessionRepository,
+        _passwordHasher: PasswordHasher,
+        _tokenHasher: TokenHasher,
+        _userAgentParser: UserAgentParser,
+        _userCache: UserCache,
+        _sessionCache: SessionCache,
+      ) => {
+        return new LoginUserService(
           _tokenService,
           _userRepository,
           _sessionRepository,

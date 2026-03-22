@@ -15,23 +15,34 @@ import {
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiHeader,
+  ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { type Response } from 'express';
 import { SESSION_CONSTANTS } from '@/domains/constants';
 import {
+  LoginUserCommand,
+  type LoginUserUseCase,
+  LoginUserUseCaseSymbol,
   RegisterUserCommand,
   type RegisterUserUseCase,
   RegisterUserUseCaseSymbol,
 } from '@/domains/ports/in';
+import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthErrorFilter } from './filters/auth-error.filter';
 import {
   AuthBadRequestResponse,
   AuthResultResponse,
   UserAlreadyExistResponse,
+  UserBannedResponse,
+  UserNotFoundResponse,
+  UserPasswordMismatchResponse,
 } from './responses';
 
 @ApiTags('Авторизация')
@@ -44,6 +55,8 @@ export class AuthController {
   public constructor(
     @Inject(RegisterUserUseCaseSymbol)
     private readonly _registerUserUseCase: RegisterUserUseCase,
+    @Inject(LoginUserUseCaseSymbol)
+    private readonly _loginUserUseCase: LoginUserUseCase,
     private readonly _configService: ConfigService,
   ) {}
 
@@ -78,6 +91,51 @@ export class AuthController {
     );
 
     const authResult = await this._registerUserUseCase.execute(command);
+
+    this._addRefreshTokenToResponse(res, authResult.tokens.refresh);
+
+    return AuthResultResponse.fromDomain(authResult);
+  }
+
+  @Post('login')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Вход в аккаунт' })
+  @ApiOkResponse({
+    type: AuthResultResponse,
+    description: 'Успешный вход в аккаунт',
+  })
+  @ApiBadRequestResponse({
+    type: AuthBadRequestResponse,
+    description: 'Переданы неверные данные',
+  })
+  @ApiUnauthorizedResponse({
+    type: UserPasswordMismatchResponse,
+    description: 'Передан неверный пароль от аккаунта',
+  })
+  @ApiForbiddenResponse({
+    type: UserBannedResponse,
+    description: 'Попытка входа в заблокированный аккаунт',
+  })
+  @ApiNotFoundResponse({
+    type: UserNotFoundResponse,
+    description: 'Пользователь с переданным username не найден',
+  })
+  @ApiHeader({
+    name: 'user-agent',
+    required: false,
+  })
+  public async login(
+    @Body() dto: LoginUserDto,
+    @Res({ passthrough: true }) res: Response,
+    @Headers('user-agent') userAgent: string,
+  ): Promise<AuthResultResponse> {
+    const command = new LoginUserCommand(
+      dto.username,
+      dto.password,
+      userAgent ?? '',
+    );
+
+    const authResult = await this._loginUserUseCase.execute(command);
 
     this._addRefreshTokenToResponse(res, authResult.tokens.refresh);
 

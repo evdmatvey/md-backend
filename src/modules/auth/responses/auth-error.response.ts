@@ -117,6 +117,20 @@ export class UserBannedResponse {
     description: 'Тип HTTP ошибки в виде кода',
   })
   statusCode: number;
+
+  @ApiProperty({
+    required: true,
+    example: 'Нарушение правил платформы',
+    description: 'Причина блокировки',
+  })
+  reason: string;
+
+  @ApiProperty({
+    required: true,
+    example: '2025-11-25T06:00:36.138Z',
+    description: 'Дата блокировки',
+  })
+  occurredAt: Date;
 }
 
 export class SessionNotFoundResponse {
