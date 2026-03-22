@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from '@/domains/entities/document.entity';
+import { Document } from '@/domains/entities';
 
 export class DocumentEntityResponse {
   @ApiProperty({

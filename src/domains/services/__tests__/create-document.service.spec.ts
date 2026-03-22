@@ -1,4 +1,4 @@
-import { NEW_ID } from '@/domains/constants/ids.constants';
+import { NEW_ID } from '@/domains/constants';
 import { Document } from '@/domains/entities/document.entity';
 import { DocumentNotUniqueSlugError } from '@/domains/errors/document.error';
 import { CreateDocumentCommand } from '@/domains/ports/in/create-document.command';

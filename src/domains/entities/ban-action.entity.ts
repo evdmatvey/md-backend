@@ -1,4 +1,4 @@
-import { NEW_ID } from '../constants/ids.constants';
+import { NEW_ID } from '../constants';
 import { ModerationActionType } from '../enums/moderation-action-type.enum';
 import { ModerationAction } from './moderation-action.entity';
 

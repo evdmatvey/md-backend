@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryFailedError, QueryRunner, Repository } from 'typeorm';
-import { Document } from '@/domains/entities/document.entity';
-import { ModerationActionType } from '@/domains/enums/moderation-action-type.enum';
+import { Document } from '@/domains/entities';
 import {
   DocumentNotFoundError,
   DocumentNotUniqueSlugError,
-} from '@/domains/errors/document.error';
-import { DocumentRepositoryPort } from '@/domains/ports/out/document-repository.port';
+} from '@/domains/errors';
+import { DocumentRepositoryPort } from '@/domains/ports/out';
 import { DocumentMapper } from './document.mapper';
 import { DocumentActionEntity } from './entities/document-action.entity';
 import { DocumentEntity } from './entities/document.entity';
@@ -89,7 +88,7 @@ export class DocumentRepository implements DocumentRepositoryPort {
       existingEntity.title = document.title;
       existingEntity.markdown = document.markdown;
 
-      if (this._hasNewDocumentAction(document)) {
+      if (document.isBanHistoryUpdated) {
         await this._saveNewDocumentAction(document, queryRunner);
       }
 
@@ -103,14 +102,6 @@ export class DocumentRepository implements DocumentRepositoryPort {
     } finally {
       await queryRunner.release();
     }
-  }
-
-  private _hasNewDocumentAction(document: Document): boolean {
-    const banHistory = document.banHistory;
-
-    if (banHistory.length === 0) return false;
-
-    return banHistory[banHistory.length - 1].isNew();
   }
 
   private async _saveNewDocumentAction(
@@ -127,7 +118,7 @@ export class DocumentRepository implements DocumentRepositoryPort {
     const action = documentActionRepository.create({
       documentId: document.id,
       adminId: newAction.moderatorId,
-      type: newAction.type === ModerationActionType.BAN ? 'ban' : 'unban',
+      type: newAction.type,
       reason: newAction.reason,
     });
 

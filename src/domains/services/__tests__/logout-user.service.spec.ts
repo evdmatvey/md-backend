@@ -1,0 +1,81 @@
+import { Session } from '@/domains/entities';
+import { SessionNotFoundError } from '@/domains/errors';
+import { LogoutUserCommand } from '@/domains/ports/in';
+import {
+  SessionCachePort,
+  SessionRepositoryPort,
+  TokenServicePort,
+} from '@/domains/ports/out';
+import { LogoutUserService } from '../logout-user.service';
+
+describe('LogoutUserService', () => {
+  let sessionRepositoryPort: jest.Mocked<SessionRepositoryPort>;
+  let tokenServicePort: jest.Mocked<TokenServicePort>;
+  let sessionCachePort: jest.Mocked<SessionCachePort>;
+  let logoutUserService: LogoutUserService;
+
+  beforeEach(() => {
+    sessionRepositoryPort = {
+      save: jest.fn(),
+      delete: jest.fn(),
+      findById: jest.fn(),
+      findAllByUserId: jest.fn(),
+    } as jest.Mocked<SessionRepositoryPort>;
+    tokenServicePort = {
+      generatePair: jest.fn(),
+      verifyRefreshToken: jest.fn(),
+    } as jest.Mocked<TokenServicePort>;
+    sessionCachePort = {
+      get: jest.fn(),
+      set: jest.fn(),
+      delete: jest.fn(),
+    };
+
+    logoutUserService = new LogoutUserService(
+      tokenServicePort,
+      sessionRepositoryPort,
+      sessionCachePort,
+    );
+  });
+
+  it('Should success logout user', async () => {
+    setupSuccessfulLogout();
+
+    const command = new LogoutUserCommand('refreshToken');
+    await logoutUserService.execute(command);
+
+    expect(sessionRepositoryPort.save).toHaveBeenCalledWith(
+      expect.objectContaining({ isRevoked: true }),
+    );
+  });
+
+  it('Should throw session not found error', async () => {
+    setupNotFoundLogin();
+
+    const command = new LogoutUserCommand('refreshToken');
+
+    expect(logoutUserService.execute(command)).rejects.toThrow(
+      new SessionNotFoundError('sessionId'),
+    );
+  });
+
+  function setupSuccessfulLogout() {
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
+      userId: 'userId',
+      sessionId: 'sessionId',
+    });
+    sessionCachePort.get.mockResolvedValue(null);
+    sessionRepositoryPort.findById.mockResolvedValue(
+      Session.create('userId', { browser: 'Chrome', os: 'Windows' }),
+    );
+  }
+
+  function setupNotFoundLogin() {
+    tokenServicePort.verifyRefreshToken.mockResolvedValue({
+      userId: 'userId',
+      sessionId: 'sessionId',
+    });
+    sessionCachePort.get.mockResolvedValue(null);
+    sessionRepositoryPort.findById.mockResolvedValue(null);
+  }
+});

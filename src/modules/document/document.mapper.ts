@@ -1,5 +1,4 @@
-import { Document } from '@/domains/entities/document.entity';
-import { ModerationActionHistory } from '@/domains/entities/moderation-action-history.entity';
+import { Document, ModerationActionHistory } from '@/domains/entities';
 import { DocumentEntity } from './entities/document.entity';
 
 export class DocumentMapper {

@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CreateDocumentUseCaseSymbol } from '@/domains/ports/in/create-document.use-case';
-import { GetDocumentBySlugUseCaseSymbol } from '@/domains/ports/in/get-document-by-slug.use-case';
-import { CreateDocumentService } from '@/domains/services/create-document.service';
-import { GetDocumentBySlugService } from '@/domains/services/get-document-by-slug.service';
-import { RedisModule } from '@/modules/redis/redis.module';
-import { RedisService } from '@/modules/redis/redis.service';
+import {
+  CreateDocumentUseCaseSymbol,
+  GetDocumentBySlugUseCaseSymbol,
+} from '@/domains/ports/in';
+import {
+  CreateDocumentService,
+  GetDocumentBySlugService,
+} from '@/domains/services';
+import { RedisModule } from '@/modules/shared/redis';
 import { DocumentController } from './document.controller';
 import { DocumentRepository } from './document.repository';
 import { DocumentActionEntity } from './entities/document-action.entity';
@@ -23,7 +26,6 @@ import { SlugGenerator } from './libs/slug-generator.lib';
   controllers: [DocumentController],
   providers: [
     DocumentRepository,
-    RedisService,
     DocumentCache,
     SlugGenerator,
     {

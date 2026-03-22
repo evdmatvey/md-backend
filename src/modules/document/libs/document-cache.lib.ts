@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Document } from '@/domains/entities/document.entity';
-import { DocumentCachePort } from '@/domains/ports/out/document-cache.port';
-import { RedisService } from '@/modules/redis/redis.service';
+import { Document } from '@/domains/entities';
+import { DocumentCachePort } from '@/domains/ports/out';
+import { RedisService } from '@/modules/shared/redis';
 
 @Injectable()
 export class DocumentCache implements DocumentCachePort {

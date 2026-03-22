@@ -1,22 +1,18 @@
-import { NEW_ID } from '../constants/ids.constants';
-import { ModerationActionType } from '../enums/moderation-action-type.enum';
+import { NEW_ID } from '../constants';
 import { DocumentUnexpectedActionError } from '../errors/document.error';
-import { BanAction } from './ban-action.entity';
-import { EntityWithId } from './entity-with-id.entity';
+import { BanableEntity } from './banable.entity';
 import { ModerationActionHistory } from './moderation-action-history.entity';
-import { ModerationAction } from './moderation-action.entity';
-import { UnbanAction } from './unban-action.entity';
 
-export class Document extends EntityWithId {
+export class Document extends BanableEntity {
   public constructor(
     id: string,
     public readonly slug: string,
     public title: string,
     public markdown: string,
     public createdAt: Date,
-    private readonly _banHistory: ModerationActionHistory,
+    banHistory: ModerationActionHistory,
   ) {
-    super(id);
+    super(id, banHistory);
   }
 
   public static create(
@@ -34,32 +30,7 @@ export class Document extends EntityWithId {
     );
   }
 
-  public ban(moderatorId: string, reason: string): void {
-    if (this.isBanned) throw new DocumentUnexpectedActionError(this.isBanned);
-
-    this._banHistory.add(BanAction.create(moderatorId, reason));
-  }
-
-  public unban(moderatorId: string, reason: string): void {
-    if (!this.isBanned) throw new DocumentUnexpectedActionError(this.isBanned);
-
-    this._banHistory.add(UnbanAction.create(moderatorId, reason));
-  }
-
-  public get isBanned(): boolean {
-    return this._banHistory.isBanned;
-  }
-
-  public get banHistory(): readonly ModerationAction[] {
-    return this._banHistory.history;
-  }
-
-  public get currentBan(): BanAction | null {
-    if (!this.isBanned) return null;
-
-    if (this._banHistory.lastAction?.type === ModerationActionType.BAN)
-      return this._banHistory.lastAction as BanAction;
-
-    return null;
+  protected throwUnexpectedBanActionError(isBanned: boolean): void {
+    throw new DocumentUnexpectedActionError(isBanned);
   }
 }

@@ -8,3 +8,23 @@ export {
   GetDocumentBySlugUseCaseSymbol,
   type GetDocumentBySlugUseCase,
 } from './get-document-by-slug.use-case';
+export { RegisterUserCommand } from './register-user.command';
+export {
+  RegisterUserUseCaseSymbol,
+  type RegisterUserUseCase,
+} from './register-user.use-case';
+export { LoginUserCommand } from './login-user.command';
+export {
+  LoginUserUseCaseSymbol,
+  type LoginUserUseCase,
+} from './login-user.use-case';
+export { LogoutUserCommand } from './logout-user.command';
+export {
+  LogoutUserUseCaseSymbol,
+  type LogoutUserUseCase,
+} from './logout-user.use-case';
+export { ExtendSessionCommand } from './extend-session.command';
+export {
+  ExtendSessionUseCaseSymbol,
+  type ExtendSessionUseCase,
+} from './extend-session.use-case';
