@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { Session, User } from '@/domains/entities';
 import {
@@ -12,6 +12,7 @@ import { SessionCache } from '../libs/session-cache.lib';
 import { TokenService } from '../libs/token-service.lib';
 import { SessionRepository } from '../session.repository';
 
+@Injectable()
 export class JwtAuthGuard implements CanActivate {
   public constructor(
     private readonly _tokenService: TokenService,
