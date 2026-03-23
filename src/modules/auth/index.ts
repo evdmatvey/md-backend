@@ -3,3 +3,4 @@ export { JwtAuthGuard } from './guards/jwt-auth.guard';
 export { RoleGuard } from './guards/role.guard';
 export { Auth } from './decorators/auth.decorator';
 export { Roles } from './decorators/roles.decorator';
+export { CurrentUser } from './decorators/current-user.decorator';
