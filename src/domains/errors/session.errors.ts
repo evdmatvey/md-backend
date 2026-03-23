@@ -29,3 +29,9 @@ export class SessionTokenError extends DomainError {
     super('Нет доступа. Войдите или зарегистрируйтесь.');
   }
 }
+
+export class NoAccessError extends DomainError {
+  public constructor() {
+    super('Нет доступа.');
+  }
+}

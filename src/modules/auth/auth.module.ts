@@ -24,6 +24,7 @@ import {
 } from '../user';
 import { AuthController } from './auth.controller';
 import { SessionEntity } from './entities/session.entity';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { SessionCache } from './libs/session-cache.lib';
 import { TokenHasher } from './libs/token-hasher.lib';
 import { TokenService } from './libs/token-service.lib';
@@ -54,6 +55,7 @@ import { SessionRepository } from './session.repository';
     SessionCache,
     TokenHasher,
     SessionRepository,
+    JwtAuthGuard,
     {
       provide: RegisterUserUseCaseSymbol,
       useClass: RegisterUserService,
@@ -178,5 +180,6 @@ import { SessionRepository } from './session.repository';
       inject: [TokenService, SessionRepository, SessionCache],
     },
   ],
+  exports: [JwtAuthGuard],
 })
 export class AuthModule {}

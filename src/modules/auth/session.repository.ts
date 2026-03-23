@@ -40,6 +40,13 @@ export class SessionRepository implements SessionRepositoryPort {
     }
   }
 
+  public async updateSessionLastUsedAt(sessionId: string): Promise<void> {
+    await this._sessionRepository.update(
+      { id: sessionId },
+      { lastUsedAt: new Date() },
+    );
+  }
+
   private async _create(session: Session): Promise<Session> {
     const created = this._sessionRepository.create();
 
