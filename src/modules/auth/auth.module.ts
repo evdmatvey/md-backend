@@ -19,9 +19,9 @@ import {
   PasswordHasher,
   UserAgentParser,
   UserCache,
-  UserModule,
   UserRepository,
 } from '../user';
+import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { SessionEntity } from './entities/session.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -47,8 +47,8 @@ import { SessionRepository } from './session.repository';
       }),
     }),
     ConfigModule,
-    UserModule,
     RedisModule,
+    UserModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -182,6 +182,12 @@ import { SessionRepository } from './session.repository';
       inject: [TokenService, SessionRepository, SessionCache],
     },
   ],
-  exports: [JwtAuthGuard, RoleGuard],
+  exports: [
+    JwtAuthGuard,
+    RoleGuard,
+    TokenService,
+    SessionRepository,
+    SessionCache,
+  ],
 })
 export class AuthModule {}
