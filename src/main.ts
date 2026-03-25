@@ -27,6 +27,7 @@ async function bootstrap() {
       .setTitle('MD API')
       .setVersion('0.0.1')
       .setDescription('API чтобы делится md файлами в виде web страниц')
+      .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('swagger', app, document);
