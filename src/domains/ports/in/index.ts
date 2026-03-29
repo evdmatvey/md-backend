@@ -33,3 +33,8 @@ export {
   GetUsersUseCaseSymbol,
   type GetUsersUseCase,
 } from './get-users.use-case';
+export { ChangeUserRoleCommand } from './change-user-role.command';
+export {
+  ChangeUserRoleUseCaseSymbol,
+  type ChangeUserRoleUseCase,
+} from './change-user-role.use-case';
