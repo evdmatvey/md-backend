@@ -51,3 +51,9 @@ export class UserBannedError extends DomainError {
     super(`Пользователь "${username}" заблокирован.`);
   }
 }
+
+export class UnexpectedRoleActionError extends DomainError {
+  public constructor() {
+    super('Вы не можете назначить себе новую роль.');
+  }
+}

@@ -5,3 +5,4 @@ export { LoginUserService } from './login-user.service';
 export { ExtendSessionService } from './extend-session.service';
 export { LogoutUserService } from './logout-user.service';
 export { GetUsersService } from './get-users.service';
+export { ChangeUserRoleService } from './change-user-role.service';
