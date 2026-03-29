@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccountModule } from './account';
 import { AuthModule } from './auth';
 import { DocumentModule } from './document';
 import { RedisModule } from './shared/redis';
-import { UserModule } from './user';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UserModule } from './user';
     RedisModule,
     AuthModule,
     UserModule,
+    AccountModule,
   ],
   controllers: [],
   providers: [],
