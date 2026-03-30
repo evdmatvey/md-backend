@@ -27,7 +27,7 @@ export class ChangeUserRoleService implements ChangeUserRoleUseCase {
     if (role === UserRole.USER) user.demoteToUser(adminId, reason);
 
     const updatedUser = await this._userRepository.save(user);
-    await this._userCache.set(user.id, user);
+    await this._userCache.set(user.id, updatedUser);
 
     return updatedUser;
   }
