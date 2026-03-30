@@ -42,6 +42,7 @@ import {
   type RegisterUserUseCase,
   RegisterUserUseCaseSymbol,
 } from '@/domains/ports/in';
+import { UserNotFoundResponse } from '../user';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthErrorFilter } from './filters/auth-error.filter';
@@ -53,7 +54,6 @@ import {
   SessionNotFoundResponse,
   UserAlreadyExistResponse,
   UserBannedResponse,
-  UserNotFoundResponse,
   UserPasswordMismatchResponse,
 } from './responses';
 

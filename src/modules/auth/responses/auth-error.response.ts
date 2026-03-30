@@ -73,29 +73,6 @@ export class UserPasswordMismatchResponse {
   statusCode: number;
 }
 
-export class UserNotFoundResponse {
-  @ApiProperty({
-    required: true,
-    example: 'Пользователь по имени "username" не найден.',
-    description: 'Сообщение описывающее ошибку',
-  })
-  message: string;
-
-  @ApiProperty({
-    required: true,
-    example: 'USER_NOT_FOUND',
-    description: 'Тип ошибки в строковом виде',
-  })
-  error: string;
-
-  @ApiProperty({
-    required: true,
-    example: 404,
-    description: 'Тип HTTP ошибки в виде кода',
-  })
-  statusCode: number;
-}
-
 export class UserBannedResponse {
   @ApiProperty({
     required: true,
