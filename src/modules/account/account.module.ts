@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
-import { GetUsersUseCaseSymbol } from '@/domains/ports/in';
-import { UserRepositoryPort } from '@/domains/ports/out';
-import { GetUsersService } from '@/domains/services';
+import {
+  ChangeUserRoleUseCaseSymbol,
+  GetUsersUseCaseSymbol,
+} from '@/domains/ports/in';
+import type { UserCachePort, UserRepositoryPort } from '@/domains/ports/out';
+import { ChangeUserRoleService, GetUsersService } from '@/domains/services';
 import { AuthModule } from '../auth';
-import { UserModule, UserRepository } from '../user';
+import { UserCache, UserModule, UserRepository } from '../user';
 import { AccountController } from './account.controller';
 
 @Module({
@@ -16,10 +19,24 @@ import { AccountController } from './account.controller';
     },
     {
       provide: GetUsersUseCaseSymbol,
-      useFactory: (_usersRepository: UserRepositoryPort) => {
-        return new GetUsersService(_usersRepository);
+      useFactory: (_userRepository: UserRepositoryPort) => {
+        return new GetUsersService(_userRepository);
       },
       inject: [UserRepository],
+    },
+    {
+      provide: ChangeUserRoleUseCaseSymbol,
+      useClass: ChangeUserRoleService,
+    },
+    {
+      provide: ChangeUserRoleUseCaseSymbol,
+      useFactory: (
+        _userRepository: UserRepositoryPort,
+        _userCache: UserCachePort,
+      ) => {
+        return new ChangeUserRoleService(_userRepository, _userCache);
+      },
+      inject: [UserRepository, UserCache],
     },
   ],
 })
