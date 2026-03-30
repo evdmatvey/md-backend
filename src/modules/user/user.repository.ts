@@ -17,7 +17,12 @@ export class UserRepository implements UserRepositoryPort {
   ) {}
 
   public async findAll(): Promise<User[]> {
-    const users = await this._userRepository.find();
+    const users = await this._userRepository.find({
+      relations: {
+        bans: true,
+        roleAssignments: true,
+      },
+    });
 
     return users.map((user) => UserMapper.mapToDomain(user));
   }
@@ -25,6 +30,10 @@ export class UserRepository implements UserRepositoryPort {
   public async findById(userId: string): Promise<User | null> {
     const user = await this._userRepository.findOne({
       where: { id: userId },
+      relations: {
+        bans: true,
+        roleAssignments: true,
+      },
     });
 
     if (!user) return null;
@@ -35,6 +44,10 @@ export class UserRepository implements UserRepositoryPort {
   public async findByUsername(username: string): Promise<User | null> {
     const user = await this._userRepository.findOne({
       where: { username },
+      relations: {
+        bans: true,
+        roleAssignments: true,
+      },
     });
 
     if (!user) return null;
@@ -88,7 +101,14 @@ export class UserRepository implements UserRepositoryPort {
         await this._saveNewRoleAssignment(user, queryRunner);
       }
 
-      const updated = await userRepository.save(existingEntity);
+      await userRepository.save(existingEntity);
+      const updated = await userRepository.findOne({
+        where: { id: user.id },
+        relations: { bans: true, roleAssignments: true },
+      });
+
+      if (!updated) throw new UserNotFoundError({ id: user.id });
+
       await queryRunner.commitTransaction();
 
       return UserMapper.mapToDomain(updated);
@@ -135,6 +155,7 @@ export class UserRepository implements UserRepositoryPort {
       userId: user.id,
       adminId: newAssignment.assignedBy,
       reason: newAssignment.reason,
+      role: user.role,
     });
 
     await roleAssignmentRepository.save(assignment);

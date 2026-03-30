@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -25,7 +26,7 @@ export class RoleAssignmentEntity {
   @Column({ type: 'enum', enum: UserRole })
   role: UserRole;
 
-  @Column({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.roleAssignments, {

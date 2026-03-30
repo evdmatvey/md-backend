@@ -32,13 +32,11 @@ export class UserEntity {
 
   @OneToMany(() => RoleAssignmentEntity, (assignment) => assignment.user, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   roleAssignments: RoleAssignmentEntity[];
 
   @OneToMany(() => UserBanEntity, (ban) => ban.user, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   bans: UserBanEntity[];
 }
