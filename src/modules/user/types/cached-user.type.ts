@@ -1,5 +1,4 @@
-import { ModerationAction, RoleAssignmentMetadata } from '@/domains/entities';
-import { UserRole } from '@/domains/enums';
+import { ModerationActionType, UserRole } from '@/domains/enums';
 
 export type CachedUser = {
   id: string;
@@ -7,6 +6,22 @@ export type CachedUser = {
   passwordHash: string;
   role: UserRole;
   createdAt: string;
-  assignments: readonly RoleAssignmentMetadata[];
-  bans: readonly ModerationAction[];
+  assignments: CachedRoleAssignment[];
+  bans: CachedUserBan[];
+};
+
+export type CachedRoleAssignment = {
+  id: string;
+  role: UserRole;
+  assignedBy: string;
+  reason: string;
+  assignedAt: Date;
+};
+
+export type CachedUserBan = {
+  id: string;
+  moderatorId: string;
+  reason: string;
+  occurredAt: Date;
+  type: ModerationActionType;
 };

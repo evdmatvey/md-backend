@@ -1,5 +1,6 @@
 import {
   BanAction,
+  ModerationAction,
   ModerationActionHistory,
   RoleAssignmentHistory,
   RoleAssignmentMetadata,
@@ -8,7 +9,11 @@ import {
 } from '@/domains/entities';
 import { ModerationActionType } from '@/domains/enums';
 import { UserEntity } from './entities/user.entity';
-import { CachedUser } from './types/cached-user.type';
+import {
+  CachedRoleAssignment,
+  CachedUser,
+  CachedUserBan,
+} from './types/cached-user.type';
 
 export class UserMapper {
   public static mapToDomain(entity: UserEntity): User {
@@ -21,7 +26,6 @@ export class UserMapper {
       roleAssignments,
       createdAt,
     } = entity;
-
     const mappedRoleAssignments = (roleAssignments ?? []).map(
       (assignment) =>
         new RoleAssignmentMetadata(
@@ -72,16 +76,24 @@ export class UserMapper {
       passwordHash,
       role,
       createdAt: createdAt.toISOString(),
-      assignments: assignmentHistory,
-      bans: banHistory,
+      assignments: assignmentHistory.map((assignment) =>
+        this.mapAssignmentToCached(assignment),
+      ),
+      bans: banHistory.map((ban) => this.mapUserBanToCached(ban)),
     };
   }
+
   public static mapFromCached(cached: CachedUser): User {
     const { id, username, passwordHash, role, createdAt, assignments, bans } =
       cached;
 
-    const banHistory = new ModerationActionHistory([...bans]);
-    const assignmentHistory = new RoleAssignmentHistory([...assignments]);
+    const mappedAssignments = assignments.map((assignment) =>
+      this.mapAssignmentFromCached(assignment),
+    );
+    const mappedBans = bans.map((ban) => this.mapUserBanFromCached(ban));
+
+    const banHistory = new ModerationActionHistory(mappedBans);
+    const assignmentHistory = new RoleAssignmentHistory(mappedAssignments);
 
     return new User(
       id,
@@ -92,5 +104,36 @@ export class UserMapper {
       assignmentHistory,
       banHistory,
     );
+  }
+
+  public static mapAssignmentFromCached(
+    cached: CachedRoleAssignment,
+  ): RoleAssignmentMetadata {
+    const { id, assignedBy, assignedAt, reason, role } = cached;
+
+    return new RoleAssignmentMetadata(id, role, assignedBy, reason, assignedAt);
+  }
+
+  public static mapAssignmentToCached(
+    assignment: RoleAssignmentMetadata,
+  ): CachedRoleAssignment {
+    const { id, assignedBy, assignedAt, reason, role } = assignment;
+
+    return { id, assignedAt, assignedBy, reason, role };
+  }
+
+  public static mapUserBanFromCached(cached: CachedUserBan): ModerationAction {
+    const { id, moderatorId, reason, type, occurredAt } = cached;
+
+    if (type === ModerationActionType.BAN)
+      return new BanAction(id, moderatorId, reason, occurredAt);
+
+    return new UnbanAction(id, moderatorId, reason, occurredAt);
+  }
+
+  public static mapUserBanToCached(ban: ModerationAction): CachedUserBan {
+    const { id, moderatorId, reason, type, occurredAt } = ban;
+
+    return { id, moderatorId, reason, type, occurredAt };
   }
 }
